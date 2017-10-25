@@ -1,0 +1,497 @@
+* Prefix
+** About this File
+*** Author
+Joshua French
+*** Created Date
+Aug 27, 2017
+*** Description  
+    This file is strictly an org file that, when parsed by BABEL, will generate an "Config.el" that will be loaded from "init.el".
+It is self documenting and will contain all of the initialization used by this emacs. Any new package initialization or custom 
+functions should go under the * Config level in its own sub-element with any documentation necessary.
+** About babel
+*** Introduction
+  [[http://orgmode.org/worg/org-contrib/babel/][Babel Home Page]]
+    Babel is Org-mode's ability to execute source code within Org-mode documents. 
+*** Implementation
+  In the init.el file, there is one line: "(org-babel-load-file "~/.emacs.d/config.org")". This line tells Babel to look at "Config.org". When
+Babel parses that file, it will ignore anything that is not wrapped in begin_src and end_src tags. When it finds those tags. Babel will copy
+those pieces of code into a file called "Config.el" which will be loaded along side init.el as the initialization file for this emacs. Any 
+edit to the "Config.el" file will be lost the next time emacs is run. In order to keep changes, they must be wrapped in begin_src and end_src
+tags in the "Config.org" file.
+
+* Config
+** Package
+*** DONE Require Package
+#+begin_src emacs-lisp :tangle yes
+  (require 'package)
+#+end_src
+*** DONE Get GNU, Marmalade, e6h, and melpa repos.
+#+begin_src emacs-lisp :tangle yes
+  (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                           ("marmalade" . "http://marmalade-repo.org/packages/")
+                           ("e6h" . "http://www.e6h.org/packages/")
+                           ("melpa" . "http://melpa.milkbox.net/packages/")))
+#+end_src
+*** DONE Initialize
+#+begin_src emacs-lisp :tangle yes
+  (package-initialize)
+#+end_src
+** Adding locations to load-path
+*** DONE Impl
+#+begin_src emacs-lisp :tangle yes
+    (add-to-list 'load-path "~/.emacs.d/lisp/")
+    (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
+#+end_src
+** Custom Keybindings
+*** DONE Swapping buffers by M-a and M-e
+#+begin_src emacs-lisp :tangle yes
+  (global-set-key "\M-a" 'next-buffer)
+  (global-set-key "\M-e" 'previous-buffer)
+#+end_src
+*** DONE Moving (n) number of lines at a time with M-p and M-n
+#+begin_src emacs-lisp :tangle yes
+  (global-set-key "\M-p" (lambda () (interactive) (forward-line -5)))
+  (global-set-key "\M-n" (lambda () (interactive) (forward-line 5)))
+#+end_src
+*** DONE Shrinking window with C-x _
+#+begin_src emacs-lisp :tangle yes
+  (global-set-key (kbd "C-x _") 'shrink-window)
+#+end_src
+*** DONE Auto Completion tied to M-/
+#+begin_src emacs-lisp :tangle yes
+  (global-set-key (kbd "M-/") 'company-complete)
+#+end_src
+** Crontab
+*** DONE The crontab is a list of commands that you want to run on a regular schedule, and also the name of the command used to manage that list
+#+begin_src emacs-lisp :tangle yes
+  (add-to-list 'auto-mode-alist '("\\.cron\\(tab\\)?\\'" . crontab-mode))
+  (add-to-list 'auto-mode-alist '("cron\\(tab\\)?\\."    . crontab-mode))
+#+end_src
+** Set up scratch buffer
+*** DONE Set up Scratch message at startup.
+#+begin_src emacs-lisp :tangle yes
+  (setq initial-scratch-message "")
+  (setq inhibit-startup-message t)
+#+end_src
+** Visual Settings
+*** FIXME Monokai theme
+Make this download the monokai theme the the themes/ folder as well. (Perhaps put it in my bitbucket)
+#+begin_src emacs-lisp :tangle yes
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+  (load-theme 'monokai t)
+#+end_src
+*** DONE This will set a visible signal for any alarms that go off. It can be edited to have a screen flash for a more visible alarm
+#+begin_src emacs-lisp :tangle yes
+  (setq visible-bell 1)
+#+end_src
+*** DONE Truncates lines instead of wrapping if they are too long for the buffer
+#+begin_src emacs-lisp :tangle yes
+  (setq-default truncate-lines t)
+#+end_src
+*** DONE Lets emacs decide how far to indent things instead of just inserting a <tab> when the tab key is pressed
+#+begin_src emacs-lisp :tangle yes
+  (setq-default indent-tabs-mode nil)
+#+end_src
+*** DONE Add custom font locks to all buffers and all files
+#+begin_src emacs-lisp :tangle yes
+(add-hook
+ 'font-lock-mode-hook
+ (function
+  (lambda ()
+    (setq
+     font-lock-keywords
+     (append
+      font-lock-keywords
+      '(
+        ("\r" (0 'my-carriage-return-face t))
+        ))))))
+#+end_src
+*** DONE Make characters after column 80 purple
+#+begin_src emacs-lisp :tangle yes
+  (setq whitespace-style
+    (quote (face trailing tab-mark lines-tail)))
+#+end_src
+** Enable Modes
+*** DONE Easy confirmation (y or n instead of yes or no)
+#+begin_src emacs-lisp :tangle yes
+  (fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+*** DONE Parenthese Matching
+#+begin_src emacs-lisp :tangle yes
+  (show-paren-mode 1)
+  (setq show-paren-style 'expression)
+#+end_src
+*** DONE Changes display of position in info bar
+#+begin_src emacs-lisp :tangle yes
+  (column-number-mode 1) 
+#+end_src
+*** DONE IDO Mode = 1
+#+begin_src emacs-lisp :tangle yes
+  (ido-mode 1)
+#+end_src
+** Dried
+*** DONE Kill all dired buffers 
+#+begin_src emacs-lisp :tangle yes
+  (defun kill-all-dired-buffers ()
+    "Kill all dired buffers."
+    (interactive)
+    (save-excursion
+      (let ((count 0))
+        (dolist (buffer (buffer-list))
+          (set-buffer buffer)
+          (when (equal major-mode 'dired-mode)
+            (setq count (1+ count))
+            (kill-buffer buffer)))
+        (message "Killed %i dired buffer(s)." count))))
+#+end_src
+** Set end of buffer marks
+*** DONE Mark end of buffer
+#+begin_src emacs-lisp :tangle yes
+  (defun my-mark-eob ()
+     (let ((existing-overlays (overlays-in (point-max) (point-max)))
+            (eob-mark (make-overlay (point-max) (point-max) nil t t))
+             (eob-text "-----------------"))
+#+end_src
+*** DONE Delete any previous EOB markers. Necessary so that they don't accumulate on calls to revert-buffer.
+#+begin_src emacs-lisp :tangle yes
+       (dolist (next-overlay existing-overlays)
+         (if (overlay-get next-overlay 'eob-overlay)
+                (delete-overlay next-overlay)))
+#+end_src
+*** DONE Add a new EOB marker.
+#+begin_src emacs-lisp :tangle yes
+       (put-text-property 0 (length eob-text)
+                          'face '(foreground-color . "slate gray") eob-text)
+       (overlay-put eob-mark 'eob-overlay t)
+       (overlay-put eob-mark 'after-string eob-text)))
+  (add-hook 'find-file-hooks 'my-mark-eob)
+#+end_src
+** File backup and recovery
+*** DONE Set where the saves directory is
+#+begin_src emacs-lisp :tangle yes
+  (setq backup-directory-alist `(("." . "~/.saves")))
+#+end_src
+*** DONE Set emacs to back up by saving
+#+begin_src emacs-lisp :tangle yes
+  (setq backup-by-copying t)
+#+end_src
+*** DONE Set how many copies to keep
+#+begin_src emacs-lisp :tangle yes
+  (setq delete-old-versions t
+    kept-new-versions 1
+    kept-old-versions 1
+    version-control t)
+#+end_src
+** Org Mode
+*** DONE Adding org mode to emacs.
+#+begin_src emacs-lisp :tangle yes
+  (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+        (setq org-startup-indented t
+                org-hide-leading-stars t)
+#+end_src
+*** DONE Customize org-todo-keywords
+#+begin_src emacs-lisp :tangle yes
+(setq org-todo-keywords 
+        '((sequence "TODO" "FIXME" "VERIFY" "|" "DONE")))
+(setq org-todo-keyword-faces
+          '(("TODO" . "orange") ("FIXME" . "red")
+            ("VERIFY" . "blue")))
+#+end_src
+*** TODO Set up keybindings
+There may be more keybindings I need to add.
+#+begin_src emacs-lisp :tangle yes
+  (add-hook 'org-mode-hook
+    '(lambda () 
+        (local-set-key "\C-c\C-l" 'org-store-link)
+
+        (local-set-key "\C-t\C-t" 'org-show-todo-tree)
+        (local-set-key "\C-t\C-l" 'org-todo-list)
+
+  ))
+
+#+end_src
+** Git
+*** FIXME Magit
+Need to make this more user friendly/learn it.
+#+begin_src emacs-lisp :tangle yes
+(require 'magit)
+(global-set-key (kbd "C-x g s") 'magit-status)
+#+end_src
+*** DONE Git Time machine
+#+begin_src emacs-lisp :tangle yes
+(require 'git-timemachine)
+(global-set-key (kbd "C-x g t") 'git-timemachine)
+#+end_src
+** Search for file function
+*** DONE Search DIRECTORY for FILE and return its full path if found, or NIL if not. If FILE is not found in DIRECTORY, the parent of DIRECTORY will be searched
+#+begin_src emacs-lisp :tangle yes
+(defun user-file-search-upward (directory file)
+  "Search DIRECTORY for FILE and return its full path if found, or NIL if not. If FILE is not found in DIRECTORY, the parent of DIRECTORY will be searched."
+  (interactive)
+  (let ((parent-dir (file-truename (concat (file-name-directory directory) "../")))
+        (current-path (if (not (string= (substring directory (- (length directory) 1)) "/"))
+                         (concat directory "/" file)
+                         (concat directory file))))
+    (if (file-exists-p current-path)
+        current-path
+        (when (and (not (string= (file-truename directory) parent-dir))
+                   (< (length parent-dir) (length (file-truename directory))))
+          (user-file-search-upward parent-dir file)))))
+#+end_src
+** Go
+*** TODO Beginning of user-go-mode-hook lambda
+**** DONE Requires and initializations
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'go-mode-hook 
+    '(lambda () 
+     (require 'go-flycheck)
+     (require 'company)
+     (require 'company-go)
+     (require 'helm-mode)
+
+     (flycheck-mode)
+     (company-mode) 
+     (linum-mode t)
+
+
+     (add-hook 'before-save-hook 'gofmt-before-save)
+     (setq gofmt-command "goimports")
+
+     (setq company-tooltip-limit 20)
+     (setq company-idle-delay .3)
+     (setq company-echo-delay 0)
+     (push 'company-go company-backends) 
+#+end_src
+**** DONE Goto definition
+#+begin_src emacs-lisp :tangle yes  
+     (local-set-key (kbd "\C-x\C-d") 'godef-jump)
+#+end_src
+**** DONE Copying go pathv ariable to emacs
+#+begin_src emacs-lisp :tangle yes  
+     (when (memq window-system '(mac ns))
+         (exec-path-from-shell-initialize)
+         (exec-path-from-shell-copy-env "GOPATH"))
+#+end_src
+**** DONE Adding function to search directory with helm mode
+#+begin_src emacs-lisp :tangle yes
+(defun user-find-file-go ()
+  "Uses helm to find a pattern stopping at the go src/ directory."
+  (interactive)
+  (if (string= (file-name-directory buffer-file-name) "src")
+      (helm-find nil)
+      (let ((Path (file-name-directory (user-file-search-upward (buffer-file-name) "src"))))
+        (if (stringp Path)
+            (progn ;; Found it.
+              (let ((default-directory Path))
+                                        ;(print default-directory)
+                (helm-find nil)
+                )
+              )(progn ;; False
+                 (print "Couldn't find go src/ directory.")
+                 )))))
+(local-set-key "\C-x\C-g" 'user-find-file-go)
+#+end_src
+**** TODO Add keybindings for build/run
+Need to add keybindings for building and running
+***** Build \C-c\C-c
+***** Test \C-c\C-t
+***** Run \C-c\C-r
+*** DONE End of user-go-mode-hook lambda
+#+begin_src emacs-lisp :tangle yes
+))
+#+end_src
+** Java Stuff
+*** DONE Adding functions for gradle
+#+begin_src emacs-lisp :tangle yes
+(defun user-gradle-build ()
+  ""
+  (interactive)
+  (gradle-build)
+)
+(defun user-gradle-run ()
+  ""
+  (interactive)
+  (gradle-execute "run")
+)
+(defun user-gradle-ide ()
+  ""
+  (interactive)
+  (gradle-execute "eclipse")
+)
+(defun user-gradle-test ()
+  ""
+  (interactive)
+  (gradle-execute "test")
+)
+(defun user-gradle-spring ()
+  ""
+  (interactive)
+  (gradle-execute "bootRun")
+)
+(defun user-gradle-clean ()
+  ""
+  (interactive)
+  (gradle-execute "clean")
+)
+(defun user-gradle-quit ()
+  ""
+  (interactive)
+  (kill-buffer "*compilation*")
+  (delete-other-windows)
+  
+)
+#+end_src
+*** DONE Adding hook + keybinds to java mode 
+#+begin_src emacs-lisp :tangle yes
+  (add-hook 'java-mode-hook
+              '(lambda ()
+               (local-set-key "\C-c\C-c" 'user-gradle-build)
+               (local-set-key "\C-c\C-r" 'user-gradle-run)
+               (local-set-key "\C-c\C-i" 'user-gradle-ide)
+               (local-set-key "\C-c\C-s" 'user-gradle-spring)
+               (local-set-key "\C-c\C-t" 'user-gradle-test)
+               (local-set-key "\C-c\C-k" 'user-gradle-clean)
+               (local-set-key "\C-c\C-q" 'user-gradle-quit)
+               (local-set-key "\C-x\C-d" 'eclim-java-find-declaration)
+               (local-set-key "\C-x\C-r" 'eclim-java-find-references)
+               (local-set-key "\C-c\C-f" 'eclim-problems-correct)
+               (local-set-key "\C-c\C-o" 'eclim-java-import-organize)
+               (local-set-key "\C-c\C-e\c" 'eclim-java-constructor)
+               (linum-mode t) 
+#+end_src
+*** DONE Use helm to find a pattern stopping at the gradle root directory
+#+begin_src emacs-lisp :tangle yes
+(defun user-find-gradle-file ()
+  "Uses helm to find a pattern stopping at the gradle root directory."
+  (interactive)
+  (if (string= (file-name-nondirectory buffer-file-name) "build.gradle")
+      (helm-find nil)
+      (let ((Path (file-name-directory (user-file-search-upward (buffer-file-name) "build.gradle"))))
+        (if (stringp Path)
+            (progn ;; Found it.
+              (let ((default-directory Path))
+                                        ;(print default-directory)
+                (helm-find nil)
+                )
+              )(progn ;; False
+                 (print "Couldn't find build.gradle.")
+                 )))))
+#+end_src
+*** DONE Adding HELM mode
+#+begin_src emacs-lisp :tangle yes
+               (require 'helm-mode)
+               (set-face-attribute 'helm-selection nil 
+                                   :background "black"
+                                   :foreground "yellow")
+               (local-set-key "\C-x\C-g" 'user-find-gradle-file)
+#+end_src
+*** DONE Adding Eclim mode and tieing other modes to it.
+#+begin_src emacs-lisp :tangle yes
+               (gradle-mode 1)
+               (require 'company)
+               (require 'eclim)
+               (require 'eclimd)
+               (require 'company-eclim)
+               (require 'yasnippet)
+               (global-eclim-mode t)
+               (global-company-mode)
+               (eclim-mode)
+               (setq help-at-pt-display-when-idle t)
+               (setq help-at-pt-timer-delay 0.1)
+               (help-at-pt-set-timer)
+               (yas-global-mode 1)
+               ;;(start-eclimd)
+               
+               ))
+#+end_src
+*** DONE Groovy Mode Hooks
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'groovy-mode-hook '(lambda ()
+             (require 'helm-mode)
+             (set-face-attribute 'helm-selection nil 
+                    :background "black"
+                    :foreground "yellow")
+             (local-set-key "\C-x\C-g" 'user-find-gradle-file)
+             (gradle-mode 1)
+             (local-set-key "\C-c\C-c" 'user-gradle-build)
+             (local-set-key "\C-c\C-r" 'user-gradle-run)
+             (local-set-key "\C-c\C-i" 'user-gradle-ide)
+             (local-set-key "\C-c\C-s" 'user-gradle-spring)
+             (local-set-key "\C-c\C-t" 'user-gradle-test)
+             (local-set-key "\C-c\C-k" 'user-gradle-clean)
+             (local-set-key "\C-c\C-q" 'user-gradle-quit)
+             (linum-mode t)
+             ))
+#+end_src
+** PB Copy
+*** DONE Copies the current buffer to the pastboard
+#+begin_src emacs-lisp :tangle yes
+  (defun user-pbcopy ()
+    "Copies the current buffer to the pastboard."
+    (interactive)
+    (let ((Output
+           (shell-command-to-string
+            (concat
+             "cat  ./"
+             (buffer-name)
+             " | pbcopy"
+             ))))
+      (progn (print "Buffer send to pastboard."))))
+  (global-set-key (kbd "M-c") 'next-buffer)
+#+end_src
+** Hex Color Highlighting
+*** DONE Define a function to show hex colors inline
+#+begin_src emacs-lisp :tangle yes
+(defvar hexcolour-keywords
+  '(("#[abcdef[:digit:]]\\{6\\}"
+     (0 (put-text-property
+         (match-beginning 0)
+         (match-end 0)
+         'face (list :background
+                     (match-string-no-properties 0)))))))
+(defun hexcolour-add-to-font-lock ()
+  (font-lock-add-keywords nil hexcolour-keywords))
+#+end_src
+*** DONE Add the hex color function to CSS, PHP, and HTML mode
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'css-mode-hook 'hexcolour-add-to-font-lock)
+(add-hook 'php-mode-hook 'hexcolour-add-to-font-lock)
+(add-hook 'html-mode-hook 'hexcolour-add-to-font-lock)
+#+end_src
+** FACE TOOLS
+*** DONE Adding custom faces to the buffers
+#+begin_src emacs-lisp :tangle yes
+(defun face-which-custom (pos)
+  (interactive "d")
+  (let ((face (or (get-char-property (point) 'read-face-name)
+                  (get-char-property (point) 'face))))
+    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+#+end_src
+** ENABLE MOUSE USE WITH "MOUSE TERM" AND "SMBL"
+*** FIXME Adding mouse functionality.
+#+begin_src emacs-lisp :tangle yes
+(unless window-system
+  (require 'mouse)
+  (xterm-mouse-mode t)
+  (defun track-mouse (e))
+  (setq mouse-sel-mode t)
+  (xterm-mouse-mode 1)
+  (global-set-key [mouse-4] '(lambda ()
+                                                           (interactive)
+                                                           (deactivate-mark)))
+  (global-set-key [mouse-5] '(lambda ()
+                                                           (interactive)
+                                                           (deactivate-mark)))
+  (global-set-key [mouse-4] '(lambda ()
+                                                           (interactive)
+                                                           (scroll-down 1)))
+  (global-set-key [mouse-5] '(lambda ()
+                                                           (interactive)
+                                                           (scroll-up 1)))
+  (defun track-mouse (e))
+  )
+#+end_src
+
+
+
+
