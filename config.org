@@ -1,5 +1,4 @@
-* Prefix
-** About this File
+* About this File
 *** Author
 Joshua French
 *** Created Date
@@ -8,12 +7,11 @@ Aug 27, 2017
     This file is strictly an org file that, when parsed by BABEL, will generate an "Config.el" that will be loaded from "init.el".
 It is self documenting and will contain all of the initialization used by this emacs. Any new package initialization or custom 
 functions should go under the * Config level in its own sub-element with any documentation necessary.
-** About babel
+* About babel
 *** Introduction
-  [[http://orgmode.org/worg/org-contrib/babel/][Babel Home Page]]
-    Babel is Org-mode's ability to execute source code within Org-mode documents. 
+  [[http://orgmode.org/worg/org-contrib/babel/][Babel]] is a package that allows you execute source code within Org-mode documents. 
 *** Implementation
-  In the init.el file, there is one line: "(org-babel-load-file "~/.emacs.d/config.org")". This line tells Babel to look at "Config.org". When
+  In the init.el file, there is the line: "(org-babel-load-file "~/.emacs.d/config.org")". This line tells Babel to look at "Config.org". When
 Babel parses that file, it will ignore anything that is not wrapped in begin_src and end_src tags. When it finds those tags. Babel will copy
 those pieces of code into a file called "Config.el" which will be loaded along side init.el as the initialization file for this emacs. Any 
 edit to the "Config.el" file will be lost the next time emacs is run. In order to keep changes, they must be wrapped in begin_src and end_src
