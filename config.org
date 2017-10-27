@@ -148,7 +148,7 @@ Make this download the monokai theme the the themes/ folder as well. (Perhaps pu
   (defun my-mark-eob ()
      (let ((existing-overlays (overlays-in (point-max) (point-max)))
             (eob-mark (make-overlay (point-max) (point-max) nil t t))
-             (eob-text "-----------------"))
+             (eob-text "#-----------------#-----------------#-----------------#"))
 #+end_src
 *** DONE Delete any previous EOB markers. Necessary so that they don't accumulate on calls to revert-buffer.
 #+begin_src emacs-lisp :tangle yes
@@ -221,7 +221,7 @@ Need to make this more user friendly/learn it.
 (global-set-key (kbd "C-x g t") 'git-timemachine)
 #+end_src
 ** Search for file function
-*** DONE Search DIRECTORY for FILE and return its full path if found, or NIL if not. If FILE is not found in DIRECTORY, the parent of DIRECTORY will be searched
+*** DONE Search $directory for $file and return its full path if found, or NIL if not. If $file is not found in $directory, the parent of $directory will be searched
 #+begin_src emacs-lisp :tangle yes
 (defun user-file-search-upward (directory file)
   "Search DIRECTORY for FILE and return its full path if found, or NIL if not. If FILE is not found in DIRECTORY, the parent of DIRECTORY will be searched."
