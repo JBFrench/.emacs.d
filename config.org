@@ -190,7 +190,7 @@ Make this download the monokai theme the the themes/ folder as well. (Perhaps pu
 *** DONE Customize org-todo-keywords
 #+begin_src emacs-lisp :tangle yes
 (setq org-todo-keywords 
-        '((sequence "TODO" "FIXME" "VERIFY" "|" "DONE")))
+        '((sequence "TODO" "VERIFY" "FIXME" "|" "DONE")))
 (setq org-todo-keyword-faces
           '(("TODO" . "orange") ("FIXME" . "red")
             ("VERIFY" . "blue")))
@@ -298,7 +298,7 @@ Need to add keybindings for building and running
 #+begin_src emacs-lisp :tangle yes
 ))
 #+end_src
-** Java Stuff
+** Java
 *** DONE Adding functions for gradle
 #+begin_src emacs-lisp :tangle yes
 (defun user-gradle-build ()
@@ -420,6 +420,43 @@ Need to add keybindings for building and running
              (local-set-key "\C-c\C-q" 'user-gradle-quit)
              (linum-mode t)
              ))
+#+end_src
+** Rust
+*** DONE Rust Mode Hook
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'rust-mode-hook 
+    '(lambda () 
+#+end_src
+*** DONE Setting up Racer
+#+begin_src emacs-lisp :tangle yes
+     (require 'racer)
+     (require 'company)
+
+     (setq racer-cmd "~/.cargo/bin/racer") ;; Rustup binaries PATH      
+     (setq racer-rust-src-path "/Users/jbfrench/rust/rust-lang/src") ;; Rust source code PATH
+
+     (add-hook 'racer-mode-hook #'eldoc-mode)
+     (add-hook 'racer-mode-hook #'company-mode)
+
+     (racer-mode)
+     
+#+end_src
+*** DONE Setting up Flycheck-Rust
+#+begin_src emacs-lisp :tangle yes
+     (require 'flycheck-rust)
+     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+     (flycheck-mode)
+
+     (require 'rust-mode)
+     (add-hook 'before-save-hook 'rust-format-buffer)
+     
+#+end_src
+*** FIXME Setting up Cargo minor mode
+I need to override the default keybinds to the ones I am more used too.
+#+begin_src emacs-lisp :tangle yes
+     (require 'cargo)
+     (cargo-minor-mode)
+))
 #+end_src
 ** PB Copy
 *** DONE Copies the current buffer to the pastboard
