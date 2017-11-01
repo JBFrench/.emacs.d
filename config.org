@@ -237,8 +237,7 @@ Need to make this more user friendly/learn it.
           (user-file-search-upward parent-dir file)))))
 #+end_src
 ** Go
-*** TODO Beginning of user-go-mode-hook lambda
-**** DONE Requires and initializations
+*** DONE Requires and initializations
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'go-mode-hook 
     '(lambda () 
@@ -260,17 +259,17 @@ Need to make this more user friendly/learn it.
      (setq company-echo-delay 0)
      (push 'company-go company-backends) 
 #+end_src
-**** DONE Goto definition
+*** DONE Goto definition
 #+begin_src emacs-lisp :tangle yes  
      (local-set-key (kbd "\C-x\C-d") 'godef-jump)
 #+end_src
-**** DONE Copying go pathv ariable to emacs
+*** DONE Copying go pathv ariable to emacs
 #+begin_src emacs-lisp :tangle yes  
      (when (memq window-system '(mac ns))
          (exec-path-from-shell-initialize)
          (exec-path-from-shell-copy-env "GOPATH"))
 #+end_src
-**** DONE Adding function to search directory with helm mode
+*** DONE Adding function to search directory with helm mode
 #+begin_src emacs-lisp :tangle yes
 (defun user-find-file-go ()
   "Uses helm to find a pattern stopping at the go src/ directory."
@@ -289,7 +288,7 @@ Need to make this more user friendly/learn it.
                  )))))
 (local-set-key "\C-x\C-g" 'user-find-file-go)
 #+end_src
-**** TODO Add keybindings for build/run
+*** TODO Add keybindings for build/run
 Need to add keybindings for building and running
 ***** Build \C-c\C-c
 ***** Test \C-c\C-t
@@ -426,14 +425,16 @@ Need to add keybindings for building and running
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'rust-mode-hook 
     '(lambda () 
+     (linum-mode t)
 #+end_src
 *** DONE Setting up Racer
 #+begin_src emacs-lisp :tangle yes
      (require 'racer)
      (require 'company)
 
-     (setq racer-cmd "~/.cargo/bin/racer") ;; Rustup binaries PATH      
-     (setq racer-rust-src-path "/Users/jbfrench/rust/rust-lang/src") ;; Rust source code PATH
+     (when (memq window-system '(mac ns))
+         (exec-path-from-shell-initialize)
+         (exec-path-from-shell-copy-env "RUST_SRC_PATH"))
 
      (add-hook 'racer-mode-hook #'eldoc-mode)
      (add-hook 'racer-mode-hook #'company-mode)
@@ -451,8 +452,34 @@ Need to add keybindings for building and running
      (add-hook 'before-save-hook 'rust-format-buffer)
      
 #+end_src
+*** DONE Use helm to find a pattern stopping at the Cargo.toml root directory
+#+begin_src emacs-lisp :tangle yes
+(defun user-find-toml-file ()
+  "Uses helm to find a pattern stopping at the gradle root directory."
+  (interactive)
+  (if (string= (file-name-nondirectory buffer-file-name) "Cargo.toml")
+      (helm-find nil)
+      (let ((Path (file-name-directory (user-file-search-upward (buffer-file-name) "Cargo.toml"))))
+        (if (stringp Path)
+            (progn ;; Found it.
+              (let ((default-directory Path))
+                                        ;(print default-directory)
+                (helm-find nil)
+                )
+              )(progn ;; False
+                 (print "Couldn't find Cargo.toml.")
+                 )))))
+#+end_src
+*** DONE Adding HELM mode
+#+begin_src emacs-lisp :tangle yes
+               (require 'helm-mode)
+               (set-face-attribute 'helm-selection nil 
+                                   :background "black"
+                                   :foreground "yellow")
+               (local-set-key "\C-x\C-g" 'user-find-toml-file)
+#+end_src
 *** FIXME Setting up Cargo minor mode
-I need to override the default keybinds to the ones I am more used too.
+I want to override the default keybinds to the ones I am more used too.
 #+begin_src emacs-lisp :tangle yes
      (require 'cargo)
      (cargo-minor-mode)
