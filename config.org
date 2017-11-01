@@ -210,7 +210,7 @@ There may be more keybindings I need to add.
 #+end_src
 ** Git
 *** FIXME Magit
-Need to make this more user friendly/learn it.
+Need to make this more user friendly/learn it. Perhaps this is not needed.
 #+begin_src emacs-lisp :tangle yes
 (require 'magit)
 (global-set-key (kbd "C-x g s") 'magit-status)
@@ -426,31 +426,29 @@ Need to add keybindings for building and running
 (add-hook 'rust-mode-hook 
     '(lambda () 
      (linum-mode t)
-#+end_src
-*** DONE Setting up Racer
-#+begin_src emacs-lisp :tangle yes
-     (require 'racer)
+     (require 'company-racer)
      (require 'company)
+     (require 'flycheck-rust)
+     (require 'rust-mode)
+     (require 'helm-mode)
+     (require 'cargo)
 
-     (when (memq window-system '(mac ns))
-         (exec-path-from-shell-initialize)
-         (exec-path-from-shell-copy-env "RUST_SRC_PATH"))
-
-     (add-hook 'racer-mode-hook #'eldoc-mode)
-     (add-hook 'racer-mode-hook #'company-mode)
-
-     (racer-mode)
-     
+     (add-hook 'before-save-hook 'rust-format-buffer)
 #+end_src
 *** DONE Setting up Flycheck-Rust
 #+begin_src emacs-lisp :tangle yes
-     (require 'flycheck-rust)
      (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
      (flycheck-mode)
+#+end_src
+*** DONE Setting up Company-Racer
+#+begin_src emacs-lisp :tangle yes
+  (unless (getenv "RUST_SRC_PATH")
+      (setenv "RUST_SRC_PATH" (expand-file-name "~/rust/rust/src")))
 
-     (require 'rust-mode)
-     (add-hook 'before-save-hook 'rust-format-buffer)
-     
+(with-eval-after-load 'company
+      (add-to-list 'company-backends 'company-racer))
+
+(company-mode)
 #+end_src
 *** DONE Use helm to find a pattern stopping at the Cargo.toml root directory
 #+begin_src emacs-lisp :tangle yes
@@ -472,7 +470,6 @@ Need to add keybindings for building and running
 #+end_src
 *** DONE Adding HELM mode
 #+begin_src emacs-lisp :tangle yes
-               (require 'helm-mode)
                (set-face-attribute 'helm-selection nil 
                                    :background "black"
                                    :foreground "yellow")
@@ -481,7 +478,6 @@ Need to add keybindings for building and running
 *** FIXME Setting up Cargo minor mode
 I want to override the default keybinds to the ones I am more used too.
 #+begin_src emacs-lisp :tangle yes
-     (require 'cargo)
      (cargo-minor-mode)
 ))
 #+end_src
