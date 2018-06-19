@@ -9,7 +9,7 @@ It is self documenting and will contain all of the initialization used by this e
 functions should go under the * Config level in its own sub-element with any documentation necessary.
 * About babel
 *** Introduction
-  [[http://orgmode.org/worg/org-contrib/babel/][Babel]] is a package that allows you execute source code within Org-mode documents. 
+[[http://orgmode.org/worg/org-contrib/babel/][    Babel]] is a package that allows you execute source code within Org-mode documents. 
 *** Implementation
   In the init.el file, there is the line: "(org-babel-load-file "~/.emacs.d/config.org")". This line tells Babel to look at "Config.org". When
 Babel parses that file, it will ignore anything that is not wrapped in begin_src and end_src tags. When it finds those tags. Babel will copy
@@ -17,7 +17,7 @@ those pieces of code into a file called "Config.el" which will be loaded along s
 edit to the "Config.el" file will be lost the next time emacs is run. In order to keep changes, they must be wrapped in begin_src and end_src
 tags in the "Config.org" file.
 
-* Config
+* Config 
 ** Package
 *** DONE Require Package
 #+begin_src emacs-lisp :tangle yes
@@ -65,12 +65,6 @@ tags in the "Config.org" file.
   (add-to-list 'auto-mode-alist '("\\.cron\\(tab\\)?\\'" . crontab-mode))
   (add-to-list 'auto-mode-alist '("cron\\(tab\\)?\\."    . crontab-mode))
 #+end_src
-** Set up scratch buffer
-*** DONE Set up Scratch message at startup.
-#+begin_src emacs-lisp :tangle yes
-  (setq initial-scratch-message "")
-  (setq inhibit-startup-message t)
-#+end_src
 ** Visual Settings
 *** FIXME Monokai theme
 Make this download the monokai theme the the themes/ folder as well. (Perhaps put it in my bitbucket)
@@ -86,9 +80,10 @@ Make this download the monokai theme the the themes/ folder as well. (Perhaps pu
 #+begin_src emacs-lisp :tangle yes
   (setq-default truncate-lines t)
 #+end_src
-*** DONE Lets emacs decide how far to indent things instead of just inserting a <tab> when the tab key is pressed
+** Tab Settings
 #+begin_src emacs-lisp :tangle yes
   (setq-default indent-tabs-mode nil)
+  (setq tab-width 4)
 #+end_src
 *** DONE Add custom font locks to all buffers and all files
 #+begin_src emacs-lisp :tangle yes
@@ -126,6 +121,10 @@ Make this download the monokai theme the the themes/ folder as well. (Perhaps pu
 *** DONE IDO Mode = 1
 #+begin_src emacs-lisp :tangle yes
   (ido-mode 1)
+#+end_src
+*** VERIFY Add line numbers to all programming modes.
+#+begin_src emacs-lisp :tangle yes
+  (add-hook 'prog-mode-hook 'linum-mode)
 #+end_src
 ** Dried
 *** DONE Kill all dired buffers 
@@ -236,8 +235,9 @@ Need to make this more user friendly/learn it. Perhaps this is not needed.
                    (< (length parent-dir) (length (file-truename directory))))
           (user-file-search-upward parent-dir file)))))
 #+end_src
-** Go
-*** DONE Requires and initializations
+** Languages
+*** Go
+**** DONE Requires and initializations
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'go-mode-hook 
     '(lambda () 
@@ -248,8 +248,6 @@ Need to make this more user friendly/learn it. Perhaps this is not needed.
 
      (flycheck-mode)
      (company-mode) 
-     (linum-mode t)
-
 
      (add-hook 'before-save-hook 'gofmt-before-save)
      (setq gofmt-command "goimports")
@@ -259,17 +257,17 @@ Need to make this more user friendly/learn it. Perhaps this is not needed.
      (setq company-echo-delay 0)
      (push 'company-go company-backends) 
 #+end_src
-*** DONE Goto definition
+**** DONE Goto definition
 #+begin_src emacs-lisp :tangle yes  
      (local-set-key (kbd "\C-x\C-d") 'godef-jump)
 #+end_src
-*** DONE Copying go pathv ariable to emacs
+**** DONE Copying go pathv ariable to emacs
 #+begin_src emacs-lisp :tangle yes  
      (when (memq window-system '(mac ns))
          (exec-path-from-shell-initialize)
          (exec-path-from-shell-copy-env "GOPATH"))
 #+end_src
-*** DONE Adding function to search directory with helm mode
+**** DONE Adding function to search directory with helm mode
 #+begin_src emacs-lisp :tangle yes
 (defun user-find-file-go ()
   "Uses helm to find a pattern stopping at the go src/ directory."
@@ -288,17 +286,17 @@ Need to make this more user friendly/learn it. Perhaps this is not needed.
                  )))))
 (local-set-key "\C-x\C-g" 'user-find-file-go)
 #+end_src
-*** TODO Add keybindings for build/run
+**** TODO Add keybindings for build/run
 Need to add keybindings for building and running
 ***** Build \C-c\C-c
 ***** Test \C-c\C-t
 ***** Run \C-c\C-r
-*** DONE End of user-go-mode-hook lambda
+**** DONE End of user-go-mode-hook lambda
 #+begin_src emacs-lisp :tangle yes
 ))
 #+end_src
-** Java
-*** DONE Adding functions for gradle
+*** Java
+**** DONE Adding functions for gradle
 #+begin_src emacs-lisp :tangle yes
 (defun user-gradle-build ()
   ""
@@ -338,7 +336,8 @@ Need to add keybindings for building and running
   
 )
 #+end_src
-*** DONE Adding hook + keybinds to java mode 
+**** DONE Adding hook + keybinds to java mode 
+C-c does gradle run.
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'java-mode-hook
               '(lambda ()
@@ -354,9 +353,8 @@ Need to add keybindings for building and running
                (local-set-key "\C-c\C-f" 'eclim-problems-correct)
                (local-set-key "\C-c\C-o" 'eclim-java-import-organize)
                (local-set-key "\C-c\C-e\c" 'eclim-java-constructor)
-               (linum-mode t) 
 #+end_src
-*** DONE Use helm to find a pattern stopping at the gradle root directory
+**** DONE Use helm to find a pattern stopping at the gradle root directory
 #+begin_src emacs-lisp :tangle yes
 (defun user-find-gradle-file ()
   "Uses helm to find a pattern stopping at the gradle root directory."
@@ -374,7 +372,7 @@ Need to add keybindings for building and running
                  (print "Couldn't find build.gradle.")
                  )))))
 #+end_src
-*** DONE Adding HELM mode
+**** DONE Adding HELM mode
 #+begin_src emacs-lisp :tangle yes
                (require 'helm-mode)
                (set-face-attribute 'helm-selection nil 
@@ -382,7 +380,7 @@ Need to add keybindings for building and running
                                    :foreground "yellow")
                (local-set-key "\C-x\C-g" 'user-find-gradle-file)
 #+end_src
-*** DONE Adding Eclim mode and tieing other modes to it.
+**** DONE Adding Eclim mode and tieing other modes to it.
 #+begin_src emacs-lisp :tangle yes
                (gradle-mode 1)
                (require 'company)
@@ -401,7 +399,7 @@ Need to add keybindings for building and running
                
                ))
 #+end_src
-*** DONE Groovy Mode Hooks
+**** DONE Groovy Mode Hooks
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'groovy-mode-hook '(lambda ()
              (require 'helm-mode)
@@ -420,12 +418,11 @@ Need to add keybindings for building and running
              (linum-mode t)
              ))
 #+end_src
-** Rust
-*** DONE Rust Mode Hook
+*** Rust
+**** DONE Rust Mode Hook
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'rust-mode-hook 
     '(lambda () 
-     (linum-mode t)
      (require 'company-racer)
      (require 'company)
      (require 'flycheck-rust)
@@ -435,12 +432,12 @@ Need to add keybindings for building and running
 
      (add-hook 'before-save-hook 'rust-format-buffer)
 #+end_src
-*** DONE Setting up Flycheck-Rust
+**** DONE Setting up Flycheck-Rust
 #+begin_src emacs-lisp :tangle yes
      (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
      (flycheck-mode)
 #+end_src
-*** DONE Setting up Company-Racer
+**** DONE Setting up Company-Racer
 #+begin_src emacs-lisp :tangle yes
   (unless (getenv "RUST_SRC_PATH")
       (setenv "RUST_SRC_PATH" (expand-file-name "~/rust/rust/src")))
@@ -450,7 +447,7 @@ Need to add keybindings for building and running
 
 (company-mode)
 #+end_src
-*** DONE Use helm to find a pattern stopping at the Cargo.toml root directory
+**** DONE Use helm to find a pattern stopping at the Cargo.toml root directory
 #+begin_src emacs-lisp :tangle yes
 (defun user-find-toml-file ()
   "Uses helm to find a pattern stopping at the gradle root directory."
@@ -468,17 +465,49 @@ Need to add keybindings for building and running
                  (print "Couldn't find Cargo.toml.")
                  )))))
 #+end_src
-*** DONE Adding HELM mode
+**** DONE Adding HELM mode
 #+begin_src emacs-lisp :tangle yes
                (set-face-attribute 'helm-selection nil 
                                    :background "black"
                                    :foreground "yellow")
                (local-set-key "\C-x\C-g" 'user-find-toml-file)
 #+end_src
-*** FIXME Setting up Cargo minor mode
+**** FIXME Setting up Cargo minor mode
 I want to override the default keybinds to the ones I am more used too.
 #+begin_src emacs-lisp :tangle yes
      (cargo-minor-mode)
+))
+#+end_src
+*** Javascript
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'js-mode-hook
+    '(lambda () 
+        (setq tab-width 2)
+        (setq js-indent-level 2)
+))
+#+end_src
+*** Elixir
+**** Elixir Mode Hook
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'elixir-mode-hook
+  (lambda () 
+    (require 'alchemist)
+    (require 'company)
+    (alchemist-mode)
+    (company-mode)
+#+end_src
+**** Formatting and Keybinds
+#+begin_src emacs-lisp :tangle yes
+    (add-hook 'before-save-hook 'elixir-format nil t)
+    (setq alchemist-test-mode-highlight-tests nil) ;; default t
+    (setq alchemist-test-ask-about-save nil)
+#+end_src
+**** Compile on Save
+#+begin_src emacs-lisp :tangle yes
+    (setq alchemist-hooks-compile-on-save t)
+#+end_src
+**** End Elixir Mode Hook
+#+begin_src emacs-lisp :tangle yes
 ))
 #+end_src
 ** PB Copy
