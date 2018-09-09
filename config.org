@@ -208,12 +208,6 @@ There may be more keybindings I need to add.
 
 #+end_src
 ** Git
-*** FIXME Magit
-Need to make this more user friendly/learn it. Perhaps this is not needed.
-#+begin_src emacs-lisp :tangle yes
-(require 'magit)
-(global-set-key (kbd "C-x g s") 'magit-status)
-#+end_src
 *** DONE Git Time machine
 #+begin_src emacs-lisp :tangle yes
 (require 'git-timemachine)
