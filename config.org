@@ -4,7 +4,7 @@ Joshua French
 *** Created Date
 Aug 27, 2017
 *** Description  
-    This file is strictly an org file that, when parsed by BABEL, will generate an "Config.el" that will be loaded from "init.el".
+    This file is strictly an org file that, when parsed by BABEL, will generate an "Config.el" that will be loaded from "init.el" whenever emacs starts.
 It is self documenting and will contain all of the initialization used by this emacs. Any new package initialization or custom 
 functions should go under the * Config level in its own sub-element with any documentation necessary.
 * About babel
