@@ -1,5 +1,6 @@
-# Compiled
+# Compiled or Generated
 *.elc
+config.el
 
 # Packaging
 .cask
@@ -9,3 +10,7 @@
 
 # Undo-tree save-files
 *.~undo-tree
+
+# elpa
+elpa/
+
