@@ -59,12 +59,6 @@ tags in the "Config.org" file.
 #+begin_src emacs-lisp :tangle yes
   (global-set-key (kbd "M-/") 'company-complete)
 #+end_src
-** Crontab
-*** DONE The crontab is a list of commands that you want to run on a regular schedule, and also the name of the command used to manage that list
-#+begin_src emacs-lisp :tangle yes
-  (add-to-list 'auto-mode-alist '("\\.cron\\(tab\\)?\\'" . crontab-mode))
-  (add-to-list 'auto-mode-alist '("cron\\(tab\\)?\\."    . crontab-mode))
-#+end_src
 ** Visual Settings
 *** FIXME Monokai theme
 Make this download the monokai theme the the themes/ folder as well. (Perhaps put it in my bitbucket)
@@ -81,6 +75,7 @@ Make this download the monokai theme the the themes/ folder as well. (Perhaps pu
   (setq-default truncate-lines t)
 #+end_src
 ** Tab Settings
+*** DONE Indent & Tabs Mode
 #+begin_src emacs-lisp :tangle yes
   (setq-default indent-tabs-mode nil)
   (setq tab-width 4)
@@ -207,12 +202,6 @@ There may be more keybindings I need to add.
   ))
 
 #+end_src
-** Git
-*** DONE Git Time machine
-#+begin_src emacs-lisp :tangle yes
-(require 'git-timemachine)
-(global-set-key (kbd "C-x g t") 'git-timemachine)
-#+end_src
 ** Search for file function
 *** DONE Search $directory for $file and return its full path if found, or NIL if not. If $file is not found in $directory, the parent of $directory will be searched
 #+begin_src emacs-lisp :tangle yes
@@ -230,8 +219,11 @@ There may be more keybindings I need to add.
           (user-file-search-upward parent-dir file)))))
 #+end_src
 ** Languages
-*** Go
+*** FIXME Go
 **** DONE Requires and initializations
+The following line needs to be put back in when I figure out why goimports won't work.
+     (setq gofmt-command "goimports")
+
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'go-mode-hook 
     '(lambda () 
@@ -244,7 +236,6 @@ There may be more keybindings I need to add.
      (company-mode) 
 
      (add-hook 'before-save-hook 'gofmt-before-save)
-     (setq gofmt-command "goimports")
 
      (setq company-tooltip-limit 20)
      (setq company-idle-delay .3)
@@ -289,7 +280,7 @@ Need to add keybindings for building and running
 #+begin_src emacs-lisp :tangle yes
 ))
 #+end_src
-*** Java
+*** FIXME Java
 **** DONE Adding functions for gradle
 #+begin_src emacs-lisp :tangle yes
 (defun user-gradle-build ()
@@ -412,7 +403,7 @@ C-c does gradle run.
              (linum-mode t)
              ))
 #+end_src
-*** Rust
+*** FIXME Rust
 **** DONE Rust Mode Hook
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'rust-mode-hook 
@@ -472,15 +463,36 @@ I want to override the default keybinds to the ones I am more used too.
      (cargo-minor-mode)
 ))
 #+end_src
-*** Javascript
+*** VERIFY Javascript
+**** Lambda Start
 #+begin_src emacs-lisp :tangle yes
-(add-hook 'js-mode-hook
-    '(lambda () 
-        (setq tab-width 2)
-        (setq js-indent-level 2)
+(add-hook 'rjsx-mode-hook
+  '(lambda ()
+#+end_src
+**** Search
+#+begin_src emacs-lisp :tangle yes
+(defun user-find-file-node ()
+  "Uses helm to find a pattern stopping at the nodejs src/ directory."
+  (interactive)
+  (if (string= (file-name-nondirectory buffer-file-name) "package.json")
+      (helm-find nil)
+      (let ((Path (file-name-directory (user-file-search-upward (buffer-file-name) "package.json"))))
+        (if (stringp Path)
+            (progn ;; Found it.
+              (let ((default-directory Path))
+                                        ;(print default-directory)
+                (helm-find nil)
+                )
+              )(progn ;; False
+                 (print "Couldn't find go src/ directory.")
+                 )))))
+(local-set-key "\C-x\C-g" 'user-find-file-node)
+#+end_src
+**** End lambda
+#+begin_src emacs-lisp :tangle yes
 ))
 #+end_src
-*** Elixir
+*** TODO Elixir
 **** Elixir Mode Hook
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'elixir-mode-hook
