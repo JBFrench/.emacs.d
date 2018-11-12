@@ -99,25 +99,27 @@ Make this download the monokai theme the the themes/ folder as well. (Perhaps pu
   (setq whitespace-style
     (quote (face trailing tab-mark lines-tail)))
 #+end_src
-** Enable Modes
-*** DONE Easy confirmation (y or n instead of yes or no)
+** DONE Easy confirmation 
+y or n instead of yes or no
 #+begin_src emacs-lisp :tangle yes
   (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
-*** DONE Parenthese Matching
+** DONE Parenthese Matching
+Highlights matching parentheses with green text.
 #+begin_src emacs-lisp :tangle yes
   (show-paren-mode 1)
   (setq show-paren-style 'expression)
 #+end_src
-*** DONE Changes display of position in info bar
+** DONE Changes display of position in info bar
 #+begin_src emacs-lisp :tangle yes
   (column-number-mode 1) 
 #+end_src
-*** DONE IDO Mode = 1
+** DONE IDO Mode = 1
+This allows find (C-x C-f) to be interactive. Repeating the command goes back to classic search.
 #+begin_src emacs-lisp :tangle yes
   (ido-mode 1)
 #+end_src
-*** VERIFY Add line numbers to all programming modes.
+** VERIFY Add line numbers to all programming modes.
 #+begin_src emacs-lisp :tangle yes
   (add-hook 'prog-mode-hook 'linum-mode)
 #+end_src
@@ -464,12 +466,19 @@ I want to override the default keybinds to the ones I am more used too.
 ))
 #+end_src
 *** VERIFY Javascript
-**** Lambda Start
+**** TODO Javascript
+**** VERIFY RJSX
+***** Lambda Start
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'rjsx-mode-hook
   '(lambda ()
+     (require 'company)
+     (require 'helm-mode)
+
+     (company-mode)
+     (helm-mode)
 #+end_src
-**** Search
+***** Search
 #+begin_src emacs-lisp :tangle yes
 (defun user-find-file-node ()
   "Uses helm to find a pattern stopping at the nodejs src/ directory."
@@ -488,49 +497,9 @@ I want to override the default keybinds to the ones I am more used too.
                  )))))
 (local-set-key "\C-x\C-g" 'user-find-file-node)
 #+end_src
-**** End lambda
+***** End lambda
 #+begin_src emacs-lisp :tangle yes
 ))
-#+end_src
-*** TODO Elixir
-**** Elixir Mode Hook
-#+begin_src emacs-lisp :tangle yes
-(add-hook 'elixir-mode-hook
-  (lambda () 
-    (require 'alchemist)
-    (require 'company)
-    (alchemist-mode)
-    (company-mode)
-#+end_src
-**** Formatting and Keybinds
-#+begin_src emacs-lisp :tangle yes
-    (add-hook 'before-save-hook 'elixir-format nil t)
-    (setq alchemist-test-mode-highlight-tests nil) ;; default t
-    (setq alchemist-test-ask-about-save nil)
-#+end_src
-**** Compile on Save
-#+begin_src emacs-lisp :tangle yes
-    (setq alchemist-hooks-compile-on-save t)
-#+end_src
-**** End Elixir Mode Hook
-#+begin_src emacs-lisp :tangle yes
-))
-#+end_src
-** PB Copy
-*** DONE Copies the current buffer to the pastboard
-#+begin_src emacs-lisp :tangle yes
-  (defun user-pbcopy ()
-    "Copies the current buffer to the pastboard."
-    (interactive)
-    (let ((Output
-           (shell-command-to-string
-            (concat
-             "cat  ./"
-             (buffer-name)
-             " | pbcopy"
-             ))))
-      (progn (print "Buffer send to pastboard."))))
-  (global-set-key (kbd "M-c") 'next-buffer)
 #+end_src
 ** Hex Color Highlighting
 *** DONE Define a function to show hex colors inline
