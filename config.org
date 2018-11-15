@@ -37,7 +37,7 @@ tags in the "Config.org" file.
 *** DONE Install all packages
 #+begin_src emacs-lisp :tangle yes
 (defun initialize-packages ()
-  "Uses helm to find a pattern stopping at the go src/ directory."
+  "Installs all packages from the init.el package-selected-packages field."
   (interactive)
   (dolist (package-name package-selected-packages)
     (package-install package-name)))
