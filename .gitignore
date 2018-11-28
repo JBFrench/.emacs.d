@@ -10,7 +10,3 @@ config.el
 
 # Undo-tree save-files
 *.~undo-tree
-
-# elpa
-elpa/
-

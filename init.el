@@ -34,9 +34,6 @@
  '(eclim-executable "/Applications/Eclipse.app/Contents/Eclipse/eclim")
  '(eclimd-default-workspace "/Users/jbfrench/code/java/")
  '(eclimd-wait-for-process t)
- '(package-selected-packages
-   (quote
-    (yaml-mode hyde protobuf-mode window-number js2-mode popup epl pkg-info async helm-core helm grails-mode go-eldoc dash company flycheck eldoc rjsx-mode sass-mode go-mode company-go rust-mode cargo flycheck-rust racer company-racer org-ac))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
