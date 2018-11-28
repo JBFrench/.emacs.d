@@ -34,14 +34,6 @@ tags in the "Config.org" file.
 #+begin_src emacs-lisp :tangle yes
 (package-initialize)
 #+end_src
-*** DONE Install all packages
-#+begin_src emacs-lisp :tangle yes
-(defun initialize-packages ()
-  "Installs all packages from the init.el package-selected-packages field."
-  (interactive)
-  (dolist (package-name package-selected-packages)
-    (package-install package-name)))
-#+end_src
 ** Adding locations to load-path
 *** DONE Impl
 (add-to-list 'load-path "~/.emacs.d/lisp/")
