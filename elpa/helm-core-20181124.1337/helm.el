@@ -763,12 +763,30 @@ you don't want to use this anymore."
   :group 'helm
   :type 'boolean)
 
-(defcustom helm-use-undecorated-frame-option nil
+(defcustom helm-use-undecorated-frame-option t
   "Display helm frame undecorated when non nil.
 
 This option have no effect with emacs versions lower than 26."
   :group 'helm
   :type 'boolean)
+
+(defcustom helm-frame-background-color nil
+  "Background color for helm frames, a string.
+Fallback to default face background when nil."
+  :group 'helm
+  :type 'string)
+
+(defcustom helm-frame-foreground-color nil
+  "Foreground color for helm frames, a string.
+Fallback to default face foreground when nil"
+  :group 'helm
+  :type 'string)
+
+(defcustom helm-frame-alpha nil
+  "Alpha parameter for helm frames, an integer.
+Fallback to 100 when nil."
+  :group 'helm
+  :type 'integer)
 
 (defcustom helm-use-frame-when-more-than-two-windows nil
   "Display helm buffer in frame when more than two windows."
@@ -1335,7 +1353,9 @@ to modify it.")
 (defvar helm-saved-selection nil
   "Value of the currently selected object when the action list is shown.")
 (defvar helm-sources nil
-  "[INTERNAL] Value of current sources in use, a list.")
+  "[INTERNAL] Value of current sources in use, a list of alists.
+The list of sources (symbols or alists) is normalized to alists in
+`helm-initialize'.")
 (defvar helm-buffer-file-name nil
   "Variable `buffer-file-name' when `helm' is invoked.")
 (defvar helm-candidate-cache (make-hash-table :test 'equal)
@@ -1435,7 +1455,8 @@ This is only used when helm is using
 (defconst helm--frame-default-attributes
   '(width height tool-bar-lines left top
     title undecorated vertical-scroll-bars
-    visibility fullscreen menu-bar-lines undecorated)
+    visibility fullscreen menu-bar-lines undecorated
+    alpha foreground-color background-color)
   "Frame parameters to save in `helm--last-frame-parameters'.")
 (defvar helm--last-frame-parameters nil
   "Frame parameters to save for later resuming.
@@ -1905,14 +1926,15 @@ i.e functions called with RET."
   ;; source that inherit actions from type, note that ACTION have to
   ;; be bound to a symbol and not to be an anonymous action
   ;; i.e. lambda or byte-code.
-  (let ((actions (helm-attr 'action nil t)))
+  (let ((actions (helm-get-actions-from-current-source)))
     (when actions
       (cl-assert (or (eq action actions)
-                     (rassq action actions)
                      ;; Compiled lambda
                      (byte-code-function-p action)
                      ;; Lambdas
-                     (and (listp action) (functionp action)))
+                     (and (listp action) (functionp action))
+                     ;; One of current actions.
+                     (rassq action actions))
                  nil "No such action `%s' for this source" action)))
   (setq helm-saved-action action)
   (setq helm-saved-selection (or (helm-get-selection) ""))
@@ -2909,6 +2931,11 @@ Note that this feature is available only with emacs-25+."
                           (+ (cdr pos) line-height)))
                 (title . "Helm")
                 (undecorated . ,helm-use-undecorated-frame-option)
+                (background-color . ,(or helm-frame-background-color
+                                         (face-attribute 'default :background)))
+                (foreground-color . ,(or helm-frame-foreground-color
+                                         (face-attribute 'default :foreground)))
+                (alpha . ,(or helm-frame-alpha 100))
                 (vertical-scroll-bars . nil)
                 (menu-bar-lines . 0)
                 (fullscreen . nil)
@@ -3484,9 +3511,10 @@ WARNING: Do not use this mode yourself, it is internal to helm."
 
 (defun helm-get-candidates (source)
   "Retrieve and return the list of candidates from SOURCE."
-  (let* (inhibit-quit
-         (candidate-fn (assoc-default 'candidates source))
+  (let* ((candidate-fn (assoc-default 'candidates source))
          (candidate-proc (assoc-default 'candidates-process source))
+         ;; See comment in helm-get-cached-candidates (Issue 2113).
+         (inhibit-quit candidate-proc)
          cfn-error
          (notify-error
           (lambda (&optional e)
@@ -3547,7 +3575,11 @@ WARNING: Do not use this mode yourself, it is internal to helm."
   "Return the cached value of candidates for SOURCE.
 Cache the candidates if there is no cached value yet."
   (let* ((name (assoc-default 'name source))
-         (candidate-cache (gethash name helm-candidate-cache)))
+         (candidate-cache (gethash name helm-candidate-cache))
+         ;; Bind inhibit-quit to ensure function terminate in case of
+         ;; quit from helm-while-no-input and processes are added to
+         ;; helm-async-processes for further deletion (Issue 2113).
+         (inhibit-quit (assoc-default 'candidates-process source)))
     (helm-aif candidate-cache
         (prog1 it (helm-log "Use cached candidates"))
       (helm-log "No cached candidates, calculate candidates")
@@ -6745,10 +6777,7 @@ The global `helm-help-message' is always added after this local help."
                       (helm-comp-read
                        "Help for: "
                        (cl-loop for src in (with-helm-buffer helm-sources)
-                                for src-val =  (if (symbolp src)
-                                                   (symbol-value src)
-                                                 src)
-                                collect `(,(assoc-default 'name src-val) .
+                                collect `(,(assoc-default 'name src) .
                                            ,src))
                        :allow-nest t
                        :exec-when-only-one t))))

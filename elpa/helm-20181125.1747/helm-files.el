@@ -1468,11 +1468,9 @@ This doesn't replace inside the files, only modify filenames."
 See `helm-ff-RET' for details.
 If MUST-MATCH is specified exit with
 `helm-confirm-and-exit-minibuffer' which handle must-match mechanism."
-  (let* ((cands (helm-marked-candidates))
-         (sel   (car cands)))
+  (let ((sel   (helm-get-selection)))
     (cl-assert sel nil "Trying to exit with no candidates")
-    (if (and (not (cdr cands))
-             (file-directory-p sel)
+    (if (and (file-directory-p sel)
              (not (string= "." (helm-basename sel))))
         (helm-execute-persistent-action)
       (if must-match
@@ -1486,8 +1484,7 @@ Behave differently depending of `helm-selection':
 
 - candidate basename is \".\" => open it in dired.
 - candidate is a directory    => expand it.
-- candidate is a file         => open it.
-- marked candidates (1+)      => open them with default action."
+- candidate is a file         => open it."
   (interactive)
   (helm-ff-RET-1))
 
@@ -3410,11 +3407,11 @@ prefix arg, one prefix arg or two prefix arg."
                  (abbreviate-file-name candidate))
                 (t (file-relative-name candidate)))
         (delete-region beg end))
-    (cond ((equal helm-current-prefix-arg '(4))
-           (abbreviate-file-name candidate))
-          ((equal helm-current-prefix-arg '(16))
-           (file-relative-name candidate))
-          (t candidate))))
+    (helm-acase helm-current-prefix-arg
+      ('(4)  (abbreviate-file-name candidate))
+      ('(16) (file-relative-name candidate))
+      ('(64) (helm-basename candidate))
+      (t candidate))))
 
 (cl-defun helm-find-files-history (arg &key (comp-read t))
   "The `helm-find-files' history.
