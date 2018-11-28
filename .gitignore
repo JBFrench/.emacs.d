@@ -1,6 +1,8 @@
 # Compiled or Generated
 *.elc
 config.el
+*.last
+*.data
 
 # Packaging
 .cask
