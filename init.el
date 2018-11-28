@@ -36,7 +36,7 @@
  '(eclimd-wait-for-process t)
  '(package-selected-packages
    (quote
-    (flycheck sass-mode rjsx-mode protobuf-mode company-go go-mode npm-mode docker-compose-mode dockerfile-mode eclim git-timemachine magit org-ac company helm find-file-in-project groovy-mode gradle-mode java-imports cff ripgrep popup irony flycheck-clang-tidy f company-rtags company-c-headers ag))))
+    (yaml-mode hyde protobuf-mode window-number js2-mode popup epl pkg-info async helm-core helm grails-mode go-eldoc dash company flycheck eldoc rjsx-mode sass-mode go-mode company-go rust-mode cargo flycheck-rust racer company-racer org-ac))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

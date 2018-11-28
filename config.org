@@ -32,12 +32,20 @@ tags in the "Config.org" file.
 #+end_src
 *** DONE Initialize
 #+begin_src emacs-lisp :tangle yes
-  (package-initialize)
+(package-initialize)
+#+end_src
+*** DONE Install all packages
+#+begin_src emacs-lisp :tangle yes
+(defun initialize-packages ()
+  "Installs all packages from init.el package-selected-packages list."
+  (interactive)
+  (dolist (package-name package-selected-packages)
+    (package-install package-name)))
 #+end_src
 ** Adding locations to load-path
 *** DONE Impl
+(add-to-list 'load-path "~/.emacs.d/lisp/")
 #+begin_src emacs-lisp :tangle yes
-    (add-to-list 'load-path "~/.emacs.d/lisp/")
     (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
 #+end_src
 ** Custom Keybindings
@@ -204,6 +212,11 @@ There may be more keybindings I need to add.
   ))
 
 #+end_src
+** Blogging
+*** Jekyll/Hyde
+#+begin_src emacs-lisp :tangle yes
+(require 'hyde)
+#+end_src
 ** Search for file function
 *** DONE Search $directory for $file and return its full path if found, or NIL if not. If $file is not found in $directory, the parent of $directory will be searched
 #+begin_src emacs-lisp :tangle yes
@@ -233,9 +246,11 @@ The following line needs to be put back in when I figure out why goimports won't
      (require 'company)
      (require 'company-go)
      (require 'helm-mode)
+     (require 'go-eldoc)
 
      (flycheck-mode)
      (company-mode) 
+     (go-eldoc-setup)
 
      (add-hook 'before-save-hook 'gofmt-before-save)
 
@@ -247,13 +262,14 @@ The following line needs to be put back in when I figure out why goimports won't
 **** DONE Goto definition
 #+begin_src emacs-lisp :tangle yes  
      (local-set-key (kbd "\C-x\C-d") 'godef-jump)
+     (local-set-key (kbd "\C-x\C-p") 'pop-tag-mark)
 #+end_src
 **** DONE Copying go pathv ariable to emacs
-#+begin_src emacs-lisp :tangle yes  
+begin_src emacs-lisp :tangle yes  
      (when (memq window-system '(mac ns))
          (exec-path-from-shell-initialize)
          (exec-path-from-shell-copy-env "GOPATH"))
-#+end_src
+end_src
 **** DONE Adding function to search directory with helm mode
 #+begin_src emacs-lisp :tangle yes
 (defun user-find-file-go ()
@@ -273,11 +289,50 @@ The following line needs to be put back in when I figure out why goimports won't
                  )))))
 (local-set-key "\C-x\C-g" 'user-find-file-go)
 #+end_src
-**** TODO Add keybindings for build/run
+**** TODO Compile/Test/Run Commands
 Need to add keybindings for building and running
-***** Build \C-c\C-c
-***** Test \C-c\C-t
-***** Run \C-c\C-r
+***** Compile
+#+begin_src emacs-lisp :tangle yes
+(defun install-go-project () 
+  "Runs 'go install' in a new buffer"
+  (interactive) 
+  (with-output-to-temp-buffer "*go-install"
+    (shell-command "go install"
+                   "*go-install"
+                   "*go-install")
+
+    (pop-to-buffer "*go-install")))
+
+(local-set-key (kbd "\C-c\C-c") 'install-go-project)
+#+end_src
+***** Test
+#+begin_src emacs-lisp :tangle yes
+(defun test-go-project () 
+  "Runs 'go test' in a new buffer"
+  (interactive) 
+  (with-output-to-temp-buffer "*go-test"
+    (shell-command "go test"
+                   "*go-test"
+                   "*go-test")
+
+    (pop-to-buffer "*go-test")))
+
+(local-set-key (kbd "\C-c\C-t") 'test-go-project)
+#+end_src
+***** Run
+#+begin_src emacs-lisp :tangle yes
+(defun run-go-project () 
+  "Runs 'go run' in a new buffer"
+  (interactive) 
+  (with-output-to-temp-buffer "*go-run"
+    (pop-to-buffer "*go-run")
+    (process-buffer 
+      (shell-command (read-string "Command Name: ")
+
+))))
+
+(local-set-key (kbd "\C-c\C-r") 'run-go-project)
+#+end_src
 **** DONE End of user-go-mode-hook lambda
 #+begin_src emacs-lisp :tangle yes
 ))
