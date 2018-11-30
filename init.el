@@ -36,7 +36,7 @@
  '(eclimd-wait-for-process t)
  '(package-selected-packages
    (quote
-    (yaml-mode window-number sass-mode rjsx-mode racer protobuf-mode org-ac hyde helm grails-mode go-eldoc flycheck-rust company-racer company-go cargo))))
+    (kubernetes toml-mode yaml-mode window-number sass-mode rjsx-mode racer protobuf-mode org-ac hyde helm grails-mode go-eldoc flycheck-rust company-racer company-go cargo))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
