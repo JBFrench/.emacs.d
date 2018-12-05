@@ -36,7 +36,7 @@ tags in the "Config.org" file.
 #+end_src
 ** Adding locations to load-path
 *** DONE Impl
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "~/.emacs.d/lisp/path/")
 #+begin_src emacs-lisp :tangle yes
     (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
 #+end_src
@@ -72,7 +72,7 @@ Make this download the monokai theme the the themes/ folder as well. (Perhaps pu
 #+end_src
 *** DONE Truncates lines instead of wrapping if they are too long for the buffer
 #+begin_src emacs-lisp :tangle yes
-  (setq-default truncate-lines t)
+  (setq-default truncate-lines t)  
 #+end_src
 ** Tab Settings
 *** DONE Indent & Tabs Mode
@@ -206,12 +206,24 @@ There may be more keybindings I need to add.
 #+end_src
 <<<<<<< HEAD
 ** Blogging
-*** Jekyll/Hyde
+*** Markdown mode
 #+begin_src emacs-lisp :tangle yes
-(require 'hyde)
+(setq easy-jekyll-basedir "~/jekyll/techblog/")
+(setq easy-jekyll-url "https://joshuabfrench.com")
+;(setq easy-jekyll-sshdomain "")
+;(setq easy-jekyll-root "/home/blog/")
+;(setq easy-jekyll-previewtime "300")
+;(setq easy-jekyll-google-cloud-storage-bucket-name "your-google-cloud-storage-bucket-name")
+(define-key global-map (kbd "C-c C-j") 'easy-jekyll)
 #+end_src
-=======
->>>>>>> 508da40647b44dac584fe688fbcac872bd0c6dc6
+*** Markdown mode
+(setq-default global-visual-line-mode t)
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'markdown-mode-hook
+  '(lambda ()
+  (setq-default truncate-lines nil)
+))
+#+end_src
 ** Search for file function
 *** DONE Search $directory for $file and return its full path if found, or NIL if not. If $file is not found in $directory, the parent of $directory will be searched
 #+begin_src emacs-lisp :tangle yes
